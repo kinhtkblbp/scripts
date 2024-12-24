@@ -30,13 +30,22 @@ for i in $(seq 1 $TIMES)
 do
     echo "Lần thử #$i:"
     
-    # Thực hiện curl và lưu kết quả vào biến
-    result=$(curl -w "\ntime_connect: %{time_connect}\ntime_starttransfer: %{time_starttransfer}\ntime_total: %{time_total}" \
+    # Thực hiện curl và lưu kết quả và mã lỗi
+    result=$(curl -w "\ntime_connect: %{time_connect}\ntime_starttransfer: %{time_starttransfer}\ntime_total: %{time_total}\nhttp_code: %{http_code}\nerrno: %{errno}\nerror: %{error}" \
         -o /dev/null -s "$URL")
+    curl_status=$?
     
-    # Kiểm tra nếu curl bị lỗi
-    if [ $? -ne 0 ]; then
-        echo "Lỗi: Không thể kết nối tới URL"
+    # Kiểm tra và hiển thị lỗi chi tiết
+    if [ $curl_status -ne 0 ]; then
+        http_code=$(echo "$result" | grep "http_code:" | cut -d' ' -f2)
+        errno=$(echo "$result" | grep "errno:" | cut -d' ' -f2)
+        error=$(echo "$result" | grep "error:" | cut -d' ' -f2-)
+        
+        echo "Lỗi kết nối tới URL:"
+        echo "- Mã trạng thái curl: $curl_status"
+        echo "- Mã HTTP: $http_code"
+        echo "- Mã lỗi (errno): $errno"
+        echo "- Chi tiết lỗi: $error"
         exit 1
     fi
     
