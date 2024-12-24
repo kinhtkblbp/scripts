@@ -38,7 +38,7 @@ do
     if [ $? -ne 0 ]; then
         echo "Lỗi: Không thể kết nối tới URL"
         exit 1
-    }
+    fi
     
     # Trích xuất các giá trị thời gian
     connect=$(echo "$result" | grep "time_connect:" | cut -d' ' -f2)
