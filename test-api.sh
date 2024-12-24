@@ -30,9 +30,10 @@ for i in $(seq 1 $TIMES)
 do
     echo "Lần thử #$i:"
     
-    # Thực hiện curl và lưu kết quả và mã lỗi
+    # Escape URL và thực hiện curl
+    escaped_url=$(printf %s "$URL" | jq -sRr @uri)
     result=$(curl -w "\ntime_connect: %{time_connect}\ntime_starttransfer: %{time_starttransfer}\ntime_total: %{time_total}\nhttp_code: %{http_code}\nerrno: %{errno}\nerror: %{error}" \
-        -o /dev/null -s "$URL")
+        -o /dev/null -s "$escaped_url")
     curl_status=$?
     
     # Kiểm tra và hiển thị lỗi chi tiết
